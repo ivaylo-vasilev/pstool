@@ -13,7 +13,7 @@ Optional arguments:
   --pid PID                                              process PID
   -v                                                     show verbose results
 ```
-The current version of **pstool** can also kill a single process or all the loaded process of a give program. The following optional arguments are related to process(es) termination:
+The current version of **pstool** can also terminate a single process or all loaded process of a give program. The following optional arguments are related to process(es) termination:
 ```
   --kill PID [PID ...]        terminate process(es)
   --killall NAME [NAME ...]   terminate process(es) by name
