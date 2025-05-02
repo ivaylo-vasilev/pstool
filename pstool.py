@@ -9,9 +9,11 @@ import sys
 PLATFORM = sys.platform
 STATUS = ["running", "stopped", "sleeping", "zombie", "dead", "idle"]
 
+# defining differences between linux and win32 in "net_connections". not aplicable now -> remove it safely
+# keep platform check (use list PLATFORMS for supported platforms)
 if PLATFORM == "linux":
-    process_attrs = ["name", "pid", "cmdline", "status", "connections"]
-    net_connections = 'connections'
+    process_attrs = ["name", "pid", "cmdline", "status", "net_connections"]
+    net_connections = 'net_connections'
 elif PLATFORM == "win32":
     process_attrs = ["name", "pid", "cmdline", "status", "net_connections"]
     net_connections = 'net_connections'
@@ -27,7 +29,7 @@ group.add_argument("--pid", type=int, help="process PID")
 group.add_argument("--kill", nargs="+", type=int, metavar="PID", help="terminate process(es)")
 group.add_argument("--killall", metavar="NAME", nargs="+", help="terminate process(es) by name")
 parser.add_argument("-v", action="store_true", help="show verbose results")
-parser.add_argument("--version", action="version", version=f"%(prog)s 2025.2.1-{PLATFORM}", help="show program version")
+parser.add_argument("--version", action="version", version=f"%(prog)s 2025.3-{PLATFORM}", help="show program version")
 args = parser.parse_args()
 
 procs = psutil.pids()
@@ -126,4 +128,7 @@ else:
             print("==========")
         counter += 1
     totalmemory = (totalmemory / 1024 / 1024)
-    print(f"processes: {counter} | used memory: {totalmemory:.3f} MB")
+    if PLATFORM == "linux":
+        print(f"processes: {counter}")
+    else:
+        print(f"processes: {counter} | used memory: {totalmemory:.3f} MB")
