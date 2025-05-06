@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import psutil
 from psutil import NoSuchProcess
@@ -9,14 +9,8 @@ import sys
 PLATFORM = sys.platform
 STATUS = ["running", "stopped", "sleeping", "zombie", "dead", "idle"]
 
-# defining differences between linux and win32 in "net_connections". not aplicable now -> remove it safely
-# keep platform check (use list PLATFORMS for supported platforms)
-if PLATFORM == "linux":
+if PLATFORM in ["linux", "win32"]:
     process_attrs = ["name", "pid", "cmdline", "status", "net_connections"]
-    net_connections = 'net_connections'
-elif PLATFORM == "win32":
-    process_attrs = ["name", "pid", "cmdline", "status", "net_connections"]
-    net_connections = 'net_connections'
 else:
     print("pstool: unsupported platform")
     sys.exit(1)
@@ -29,7 +23,7 @@ group.add_argument("--pid", type=int, help="process PID")
 group.add_argument("--kill", nargs="+", type=int, metavar="PID", help="terminate process(es)")
 group.add_argument("--killall", metavar="NAME", nargs="+", help="terminate process(es) by name")
 parser.add_argument("-v", action="store_true", help="show verbose results")
-parser.add_argument("--version", action="version", version=f"%(prog)s 2025.3-{PLATFORM}", help="show program version")
+parser.add_argument("--version", action="version", version=f"%(prog)s 2025.3.3-{PLATFORM}", help="show program version")
 args = parser.parse_args()
 
 procs = psutil.pids()
@@ -78,9 +72,12 @@ if args.name:
             totalmemory += int(prcss.memory_info()[0])
             print(f"PID: {proc.info['pid']} | name: {proc.info['name']} | memory: {memusg:.3f} MB | status: {proc.info['status']}")
             if args.v:
-                print(f"cmdline: {proc.info['cmdline']}")
-                print(f"net connections: {proc.info[net_connections]}")
-                print("==========")
+                try:
+                    print(f"cmdline: {proc.info['cmdline']}")
+                    print(f"net connections: {proc.info['net_connections']}")
+                    print("==========")
+                except KeyError as e:
+                    print(f"error: unknown key value for: {e}")
             counter += 1
     if counter == 0:
         print(f"pstool: nothing found for: '{args.name}'")
@@ -95,9 +92,12 @@ elif args.status:
             totalmemory += int(prcss.memory_info()[0])
             print(f"PID: {proc.info['pid']} | name: {proc.info['name']} | memory: {memusg:.3f} MB | status: {proc.info['status']}")
             if args.v:
-                print(f"cmdline: {proc.info['cmdline']}")
-                print(f"net connections: {proc.info[net_connections]}")
-                print("==========")
+                try:
+                    print(f"cmdline: {proc.info['cmdline']}")
+                    print(f"net connections: {proc.info['net_connections']}")
+                    print("==========")
+                except KeyError as e:
+                    print(f"error: unknown key value for: {e}")
             counter += 1
     if counter == 0:
         print(f"pstool: no processes with status: '{args.status}'")
@@ -112,8 +112,11 @@ elif args.pid:
         totalmemory += int(prcss.memory_info()[0])
         print(f"PID: {p['pid']} | name: {p['name']} | memory: {memusg:.3f} MB | status: {p['status']}")
         if args.v:
-            print(f"cmdline: {p['cmdline']}")
-            print(f"net connections: {p[net_connections]}")
+            try:
+                print(f"cmdline: {p['cmdline']}")
+                print(f"net connections: {p['net_connections']}")
+            except KeyError as e:
+                print(f"error: unknown key value for: {e}")
     else:
         print(f"pstool: no process with PID: '{args.pid}'")
 else:
@@ -123,9 +126,12 @@ else:
         memusg = (int(prcss.memory_info()[0]) / 1024 / 1024)
         print(f"PID: {proc.info['pid']} | name: {proc.info['name']} | memory: {memusg:.3f} MB | status: {proc.info['status']}")
         if args.v:
-            print(f"cmdline: {proc.info['cmdline']}")
-            print(f"net connections: {proc.info[net_connections]}")
-            print("==========")
+            try:
+                print(f"cmdline: {proc.info['cmdline']}")
+                print(f"net connections: {proc.info['net_connections']}")
+                print("==========")
+            except KeyError as e:
+                print(f"error: unknow key value for: {e}")
         counter += 1
     totalmemory = (totalmemory / 1024 / 1024)
     if PLATFORM == "linux":
