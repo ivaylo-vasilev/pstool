@@ -1,5 +1,13 @@
 #!/usr/bin/env python3
 
+##############################
+# pstool #
+# ====== #
+# Process information tool for Linux and Windows
+# Copyright (c)2025 Ivaylo Vasilev. Released under the MIT License; see LICENSE for details.
+# Author: Ivaylo Vasilev
+##############################
+
 import psutil
 from psutil import NoSuchProcess
 import argparse
